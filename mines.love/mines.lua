@@ -96,4 +96,26 @@ function M.Board:flag(i, j)
     end
 end
 
+
+function M.Board:draw()
+    y = 0
+    for i = 1, self.height do
+        x = 0
+        for j = 1, self.width do
+            tile = self:getTile(i,j)
+            if tile.flagged then
+                love.graphics.draw(images.flag, x, y)
+            elseif tile.hidden then
+                love.graphics.draw(images.hidden, x, y)
+            elseif not tile.mine then
+                love.graphics.draw(images["grid" .. tile.value], x, y)
+            elseif tile.mine then
+                love.graphics.draw(images.mine, x, y)
+            end
+            x = x + grid_size
+        end
+        y = y + grid_size
+    end
+end
+
 return M

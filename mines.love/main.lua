@@ -1,13 +1,11 @@
 mines = require('mines')
 
--- TODO fix board.hiddenCount
-
 function love.load()
     math.randomseed(os.clock())
     grid_size = 32
-    difficulty = 0.1
-    width = love.graphics.getWidth()/grid_size
-    height = love.graphics.getHeight()/grid_size
+    difficulty = 0.2
+    width = math.floor(love.graphics.getWidth()/grid_size)
+    height = math.floor(love.graphics.getHeight()/grid_size)
     board = mines.Board:new(width,height,difficulty)
     mode = "touch"  -- or flag
     gameStatus = "playing"
@@ -25,12 +23,9 @@ function love.load()
     images.grid6 = love.graphics.newImage("images/minesweeper_13.png")
     images.grid7 = love.graphics.newImage("images/minesweeper_14.png")
     images.grid8 = love.graphics.newImage("images/minesweeper_15.png")
-
-    print(board.hiddenCount, board.mineCount)   -- TODO Delete
 end
 
 function love.keypressed(key)
-    -- TODO top level cases should refer to mode
     if key == "space" then
         -- toggle mode
         if mode == "touch" then
@@ -50,8 +45,6 @@ function love.mousepressed(x, y, button, istouch)
     j = math.floor(x/grid_size) + 1
     i = math.floor(y/grid_size) + 1
 
-    print(board.hiddenCount, board.mineCount)   -- TODO Delete
-
     if mode == "flag" then
         board:flag(i, j)
     elseif mode == "touch" then
@@ -63,27 +56,6 @@ function love.mousepressed(x, y, button, istouch)
         if board.hiddenCount <= board.mineCount then
             gameStatus = "success"
         end
-    end
-end
-
-function mines.Board:draw()     -- TODO 
-    y = 0
-    for i = 1, self.height do
-        x = 0
-        for j = 1, self.width do
-            tile = self:getTile(i,j)
-            if tile.flagged then
-                love.graphics.draw(images.flag, x, y)
-            elseif tile.hidden then
-                love.graphics.draw(images.hidden, x, y)
-            elseif not tile.mine then
-                love.graphics.draw(images["grid" .. tile.value], x, y)
-            elseif tile.mine then
-                love.graphics.draw(images.mine, x, y)
-            end
-            x = x + grid_size
-        end
-        y = y + grid_size
     end
 end
 
