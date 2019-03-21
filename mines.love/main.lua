@@ -8,7 +8,7 @@ function love.load()
     height = math.floor(love.graphics.getHeight()/grid_size)
     board = mines.Board:new(width,height,difficulty)
     mode = "touch"  -- or flag
-    gameStatus = "playing"
+    gameOver = false
 
     images = {}
     images.hidden = love.graphics.newImage("images/minesweeper_00.png")
@@ -26,46 +26,43 @@ function love.load()
 end
 
 function love.keypressed(key)
-    if key == "space" then
-        -- toggle mode
-        if mode == "touch" then
-            mode = "flag"
-        else
-            mode = "touch"
-        end
-    elseif key == "r" then
-        -- reset board
-        board = mines.Board:new(board.width, board.height, difficulty)
-        gameStatus = "playing"
+    if mode == "touch" then
+        mode = "flag"
+    else
+        mode = "touch"
     end
 end
 
-function love.mousepressed(x, y, button, istouch)
+function love.mousereleased(x, y, button, istouch)
     -- transform (x, y) coordinates to tile
+    if gameOver then
+        -- reset game on mouse release
+        gameOver = false
+        board = mines.Board:new(width, height, difficulty)
+        return
+    end
+
     j = math.floor(x/grid_size) + 1
     i = math.floor(y/grid_size) + 1
-
     if mode == "flag" then
         board:flag(i, j)
     elseif mode == "touch" then
         mine = board:reveal(i, j)
-        if mine then
-            gameStatus = "fail"
-        end
-
-        if board.hiddenCount <= board.mineCount then
-            gameStatus = "success"
+        if mine or board.hiddenCount <= board.mineCount then
+            gameOver = true
+            -- reveal all times
+            for i = 1, board.height do
+                for j = 1, board.width do
+                    tile = board:getTile(i,j)
+                    tile.flagged = false
+                    tile.hidden = false
+                end
+            end
         end
     end
 end
 
 function love.draw()
     board:draw()
-    if gameStatus == "success" then
-        love.graphics.print("You win!")
-    elseif gameStatus == "fail" then
-        love.graphics.print("Game over")
-    else
-        love.graphics.print("mode = " .. mode)
-    end
+    love.graphics.print("mode -- " .. mode)
 end

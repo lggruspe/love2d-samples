@@ -38,7 +38,7 @@ function M.Board:new(width, height, difficulty)
         end
     end
 
-    -- update values for tiles that aren't mines by adding one to surrounding tiles
+    -- update value of tiles that aren't mines by adding 1 to surrounding tiles
     for i = 1, height do
         for j = 1, width do
             tile = board.tiles[i][j]
@@ -58,7 +58,6 @@ function M.Board:new(width, height, difficulty)
 end
 
 function M.Board:getTile(i, j)
-    -- returns tiles[i][j]
     if self.tiles[i] and self.tiles[i][j] then
         return self.tiles[i][j]
     end
@@ -95,7 +94,6 @@ function M.Board:flag(i, j)
         tile.flagged = not tile.flagged
     end
 end
-
 
 function M.Board:draw()
     y = 0
