@@ -17,19 +17,30 @@ function Square:draw(square_size, r,g,b)
     love.graphics.rectangle("fill", self.x, self.y, square_size, square_size)
 end
 
-local function createRandomFruit(width, height, square_size)
+local function createRandomFruit(width, height, square_size, blacklist)
     -- (width and height of the window)
-    -- TODO fruit must not be in self.squares
-    x = math.random(0, width-1)
-    y = math.random(0, height-1)
-    x = x - x % square_size
-    y = y - y % square_size
+    -- fruit must not be in blacklist
+
+    local function isBlacklisted(x, y)
+        for _, pair in pairs(blacklist) do
+            if pair.x == x and pair.y == y then
+                return true
+            end
+        end
+        return false
+    end
+
+    repeat 
+        x = math.random(0, width-1)
+        y = math.random(0, height-1)
+        x = x - x % square_size
+        y = y - y % square_size
+    until(not isBlacklisted(x, y))
     return Square:new{ x=x, y=y, dx=0, dy=0 }
 end
 
 local Snake = {}
 function Snake:new()
-    -- TODO set x, y, dx and dy from parameters
     -- dx and dy are in pixels
     square_size = 20
     snake = {
@@ -125,7 +136,9 @@ end
 function love.load()
     square_size = 20
     snake = Snake:new()
-    fruit = createRandomFruit(love.graphics.getWidth(), love.graphics.getHeight(), square_size)
+    snake:grow()
+    snake:grow()
+    fruit = createRandomFruit(love.graphics.getWidth(), love.graphics.getHeight(), square_size, snake.squares)
     time = 0
 end
 
@@ -136,7 +149,7 @@ function love.update(dt)
             snake:move(square_size)
             if snake:collides{"dummy", fruit} then
                 snake:grow()
-                fruit = createRandomFruit(love.graphics.getWidth(), love.graphics.getHeight(), square_size)
+                fruit = createRandomFruit(love.graphics.getWidth(), love.graphics.getHeight(), square_size, snake.squares)
             end
             if snake:collides(snake.squares) then
                 snake.alive = false
@@ -146,8 +159,7 @@ function love.update(dt)
         end
     else
         -- TODO if snake is dead, wait for snake to shrink to its original size
-        --if time >= 0.15*#snake.squares then
-        if time >= 2 then
+        if time >= 1.5 then
             snake = Snake:new()
         end
     end
