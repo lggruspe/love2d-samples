@@ -42,18 +42,18 @@ function love.mousereleased(x, y, button, istouch)
         return
     end
 
-    j = math.floor(x/grid_size) + 1
-    i = math.floor(y/grid_size) + 1
+    local j = math.floor(x/grid_size) + 1
+    local i = math.floor(y/grid_size) + 1
     if mode == "flag" then
         board:flag(i, j)
     elseif mode == "touch" then
-        mine = board:reveal(i, j)
+        local mine = board:reveal(i, j)
         if mine or board.hiddenCount <= board.mineCount then
             gameOver = true
             -- reveal all times
             for i = 1, board.height do
                 for j = 1, board.width do
-                    tile = board:getTile(i,j)
+                    local tile = board:getTile(i,j)
                     tile.flagged = false
                     tile.hidden = false
                 end

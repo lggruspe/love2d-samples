@@ -24,8 +24,8 @@ end
 
 function love.mousepressed(x, y)
     -- transform (x, y) to cell on the grid, then toggle that cell
-    x = math.floor(x/cell_size) + 1
-    y = math.floor(y/cell_size) + 1
+    local x = math.floor(x/cell_size) + 1
+    local y = math.floor(y/cell_size) + 1
     if 1 <= y and y <= grid_height and 1 <= y and x <= grid_width then
         grid[y][x] = not grid[y][x]
     end

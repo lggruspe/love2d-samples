@@ -1,12 +1,13 @@
 m2048 = require("2048")
 
 function love.load()
+    math.randomseed(os.clock())
+
     board = m2048.Board:new()
     board:spawn()
     board:spawn()
-    square_size = 80
 
-    math.randomseed(os.clock())
+    square_size = 80
     font = love.graphics.newFont(30)
     love.graphics.setFont(font)
     love.window.setMode(square_size*4, square_size*4)

@@ -2,7 +2,7 @@ local M = {}
 
 local Tile = {}
 function Tile:new(x, y, value)
-    tile = {
+    local tile = {
         hidden = true,
         flagged = false,
         value = value,          -- number of adjacent mines, or inf if tile is a mine
@@ -20,7 +20,7 @@ end
 M.Board = {}
 function M.Board:new(width, height, difficulty)
     -- difficulty is the ratio of mines to all tiles
-    board = { 
+    local board = { 
         width = width,
         height = height, 
         hiddenCount = width * height, 
@@ -41,11 +41,11 @@ function M.Board:new(width, height, difficulty)
     -- update value of tiles that aren't mines by adding 1 to surrounding tiles
     for i = 1, height do
         for j = 1, width do
-            tile = board.tiles[i][j]
+            local tile = board.tiles[i][j]
             if tile:isMine() then
                 for y = math.max(1, i-1), math.min(i+1, height) do
                     for x = math.max(1, j-1), math.min(j+1, width) do
-                        v = board.tiles[y][x]
+                        local v = board.tiles[y][x]
                         v.value = v.value + 1
                     end
                 end
@@ -67,7 +67,7 @@ end
 function M.Board:reveal(i, j)
     -- reveal smallest closed set of tiles containing tile[i][j]
     -- and returns true if the clicked tile is a mine
-    tile = self:getTile(i,j)
+    local tile = self:getTile(i,j)
     if not tile or tile.flagged or not tile.hidden then
         return false
     elseif tile.value > 0 then
@@ -89,18 +89,18 @@ function M.Board:reveal(i, j)
 end
 
 function M.Board:flag(i, j)
-    tile = self:getTile(i,j)
+    local tile = self:getTile(i,j)
     if tile and tile.hidden then
         tile.flagged = not tile.flagged
     end
 end
 
 function M.Board:draw()
-    y = 0
+    local y = 0
     for i = 1, self.height do
-        x = 0
+        local x = 0
         for j = 1, self.width do
-            tile = self:getTile(i,j)
+            local tile = self:getTile(i,j)
             if tile.flagged then
                 love.graphics.draw(images.flag, x, y)
             elseif tile.hidden then
