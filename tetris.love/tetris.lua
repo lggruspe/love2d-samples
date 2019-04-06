@@ -5,22 +5,52 @@ local M = {}
 M.Tetris = {}
 
 function M.Tetris:getTetrominoCoordinates()
-    -- return table of tetromino coordinates
-    -- note: this function should work whether tetromino is a table of coordinates or a grid
+    -- defaults to {} instead of nil
+    if self.tetromino == nil then
+        return {}
+    end
+
     local coords = {}
-
-    -- TODO add coordinates to coords
-
+    for _, coord in pairs(self.tetromino) do
+        table.insert(coords, coord)
+    end
     return coords
 end
 
 function M.Tetris:flipTetrominoBits()
-    for i, coord in pairs(self:getTetrominoCoordinates()) do
-        local y = coord[1]
-        local x = coord[2]
-        self.grid[y][x] = 1
+    -- NOTE: flipTetrominoBits should work even if tetromino is null
+    if self.tetromino == null then
+        return
+    end
+
+    for _, coord in pairs(self:getTetrominoCoordinates()) do
+        local i = coord[1]
+        local j = coord[2]
+        self.grid[i][j] = 1
     end
 end
+
+local function createITetromino(width, height)
+    -- width and height refer to the size of the tetris grid
+    -- TODO
+end
+
+local function createJTetromino(width, height)
+    -- width and height refer to the size of the tetris grid
+end
+local function createLTetromino(width, height)
+    -- width and height refer to the size of the tetris grid
+end
+local function createTTetromino(width, height)
+    -- width and height refer to the size of the tetris grid
+end
+local function createSTetromino(width, height)
+    -- width and height refer to the size of the tetris grid
+end
+local function createZTetromino(width, height)
+    -- width and height refer to the size of the tetris grid
+end
+
 
 function M.Tetris:resetTetromino()
     -- flip the coordinates in the grid specified by tetromino,
@@ -29,14 +59,22 @@ function M.Tetris:resetTetromino()
     self:flipTetrominoBits()
 
     -- create tetromino object based on nextShape
-    -- TODO should tetromino be a set of coordinates? or a grid?
+    local height = #(self.grid)
+    local width = #(self.grid[1])
+
     local shape = self.nextShape
     if shape == "I" then
+        createITetromino()
     elseif shape == "J" then
+        createJTetromino()
     elseif shape == "L" then
+        createLTetromino()
     elseif shape == "T" then
+        createTTetromino()
     elseif shape == "S" then
+        createSTetromino()
     elseif shape == "Z" then
+        createZTetromino()
     end
 
     self.nextShape = utils.getRandomShape()
@@ -46,6 +84,7 @@ function M.Tetris:new(width, height)
     -- create new Tetris instance with width-by-height grid,
     -- the coordinates of the squares of a tetromino, and
     -- the shape of the next tetromino
+    -- usage note: resetTetromino needs to be called right after
 
     local tetris = {
         grid = {},
@@ -60,26 +99,73 @@ function M.Tetris:new(width, height)
         end
     end
 
-    self:resetTetromino()
-
     self.__index = self
     return setmetatable(tetris, self)
 end
 
-function M.Tetris:moveTetromino(direction)
-    -- direction should be down, left or right
-    -- TODO
-    if direction == "down" then
-    elseif direction == "left" then
-    elseif direction == "right" then
+function M.Tetris:moveTetrominoDown()
+    local function canMoveDown()
+        for _, coord in pairs(self:getTetrominoCoordinates()) do
+            local i = coord[1]
+            local j = coord[2]
+            if self.grid[i+1][j] ~= 0 then  -- this works even when i+1 goes out of bounds
+                return false
+            end
+        end
+        return true
+    end
+
+    if canMoveDown() then
+        for _, coord in pairs(self:getTetrominoCoordinates()) do
+            coord.i = coord.i + 1
+        end
+    end
+end
+
+function M.Tetris:moveTetrominoLeft()
+    local function canMoveLeft()
+        for _, coord in pairs(self:getTetrominoCoordinates()) do
+            local i = coord[1]
+            local j = coord[2]
+            if self.grid[i][j-1] ~= 0 then
+                return false
+            end
+        end
+        return true
+    end
+
+    if canMoveLeft() then
+        for _, coord in pairs(self:getTetrominoCoordinates()) do
+            coord.j = coord.j - 1
+        end
+    end
+end
+
+function M.Tetris:moveTetrominoRight()
+    local function canMoveRight()
+        for _, coord in pairs(self:getTetrominoCoordinates()) do
+            local i = coord[1]
+            local j = coord[2]
+            if self.grid[i][j+1] ~= 0 then
+                return false
+            end
+        end
+        return true
+    end
+
+    if canMoveRight() then
+        for _, coord in pairs(self:getTetrominoCoordinates()) do
+            coord.j = coord.j + 1
+        end
     end
 end
 
 function M.Tetris:rotateTetrominoClockwise()
+    -- TODO
 end
 
 function M.Tetris:rotateTetrominoCounterClockwise()
-
+    -- TODO
 end
 
 function M.Tetris:draw()
