@@ -1,5 +1,4 @@
 local utils = require("utils")
-
 local M = {}
 
 M.Tetris = {}
@@ -24,33 +23,77 @@ function M.Tetris:flipTetrominoBits()
     end
 
     for _, coord in pairs(self:getTetrominoCoordinates()) do
-        local i = coord[1]
-        local j = coord[2]
+        local i = coord.i
+        local j = coord.j
         self.grid[i][j] = 1
     end
 end
 
 local function createITetromino(width, height)
     -- width and height refer to the size of the tetris grid
-    -- TODO
+    local j0 = math.floor(width/2) - 1
+    return {
+        {i = 1, j = j0},
+        {i = 1, j = j0 + 1},
+        {i = 1, j = j0 + 2},
+        {i = 1, j = j0 + 3}
+    }
 end
 
 local function createJTetromino(width, height)
     -- width and height refer to the size of the tetris grid
-end
-local function createLTetromino(width, height)
-    -- width and height refer to the size of the tetris grid
-end
-local function createTTetromino(width, height)
-    -- width and height refer to the size of the tetris grid
-end
-local function createSTetromino(width, height)
-    -- width and height refer to the size of the tetris grid
-end
-local function createZTetromino(width, height)
-    -- width and height refer to the size of the tetris grid
+    local j0 = math.floor(width/2)
+    return {
+        {i = 1, j = j0},  
+        {i = 1, j = j0 + 1}, 
+        {i = 1, j = j0 + 2}, 
+        {i = 2, j = j0 + 2}
+    }
 end
 
+local function createLTetromino(width, height)
+    -- width and height refer to the size of the tetris grid
+    local j0 = math.floor(width/2)
+    return {
+        {i = 1, j = j0},  
+        {i = 1, j = j0 + 1}, 
+        {i = 1, j = j0 + 2}, 
+        {i = 2, j = j0}
+    }
+end
+
+local function createTTetromino(width, height)
+    -- width and height refer to the size of the tetris grid
+    local j0 = math.floor(width/2)
+    return {
+        {i = 1, j = j0},  
+        {i = 1, j = j0 + 1}, 
+        {i = 1, j = j0 + 2}, 
+        {i = 2, j = j0 + 1}
+    }
+end
+
+local function createSTetromino(width, height)
+    -- width and height refer to the size of the tetris grid
+    local j0 = math.floor(width/2)
+    return {
+        {i = 1, j = j0 + 2},
+        {i = 1, j = j0 + 1}, 
+        {i = 2, j = j0 + 1}, 
+        {i = 2, j = j0}
+    }
+end
+
+local function createZTetromino(width, height)
+    -- width and height refer to the size of the tetris grid
+    local j0 = math.floor(width/2)
+    return {
+        {i = 1, j = j0},  
+        {i = 1, j = j0 + 1}, 
+        {i = 2, j = j0 + 1}, 
+        {i = 2, j = j0 + 2}
+    }
+end
 
 function M.Tetris:resetTetromino()
     -- flip the coordinates in the grid specified by tetromino,
@@ -63,18 +106,22 @@ function M.Tetris:resetTetromino()
     local width = #(self.grid[1])
 
     local shape = self.nextShape
+    if shape == nil then
+        shape = utils.getRandomShape()
+    end
+
     if shape == "I" then
-        createITetromino()
+        self.tetromino = createITetromino(width, height)
     elseif shape == "J" then
-        createJTetromino()
+        self.tetromino = createJTetromino(width, height)
     elseif shape == "L" then
-        createLTetromino()
+        self.tetromino = createLTetromino(width, height)
     elseif shape == "T" then
-        createTTetromino()
+        self.tetromino = createTTetromino(width, height)
     elseif shape == "S" then
-        createSTetromino()
+        self.tetromino = createSTetromino(width, height)
     elseif shape == "Z" then
-        createZTetromino()
+        self.tetromino = createZTetromino(width, height)
     end
 
     self.nextShape = utils.getRandomShape()
@@ -106,8 +153,8 @@ end
 function M.Tetris:moveTetrominoDown()
     local function canMoveDown()
         for _, coord in pairs(self:getTetrominoCoordinates()) do
-            local i = coord[1]
-            local j = coord[2]
+            local i = coord.i
+            local j = coord.j
             if self.grid[i+1][j] ~= 0 then  -- this works even when i+1 goes out of bounds
                 return false
             end
@@ -125,8 +172,8 @@ end
 function M.Tetris:moveTetrominoLeft()
     local function canMoveLeft()
         for _, coord in pairs(self:getTetrominoCoordinates()) do
-            local i = coord[1]
-            local j = coord[2]
+            local i = coord.i
+            local j = coord.j
             if self.grid[i][j-1] ~= 0 then
                 return false
             end
@@ -144,8 +191,8 @@ end
 function M.Tetris:moveTetrominoRight()
     local function canMoveRight()
         for _, coord in pairs(self:getTetrominoCoordinates()) do
-            local i = coord[1]
-            local j = coord[2]
+            local i = coord.i
+            local j = coord.j
             if self.grid[i][j+1] ~= 0 then
                 return false
             end
@@ -186,10 +233,10 @@ function M.Tetris:draw()
 
     -- draw tetromino
     love.graphics.setColor(1,1,1)
-    for i, square in pairs(self:getTetrominoCoordinates()) do
-        local x = square[2]
-        local y = square[1]
-        love.graphics.rectangle("line", x, y, square_size, square_size)
+    for _, coord in pairs(self:getTetrominoCoordinates()) do
+        local x = (coord.i - 1) * square_size
+        local y = (coord.j - 1) * square_size
+        love.graphics.rectangle("fill", x, y, square_size, square_size)
     end
 end
 
