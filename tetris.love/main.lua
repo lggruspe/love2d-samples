@@ -1,6 +1,3 @@
--- TODO nil index error when pressing down too many times
--- FIXME screen is rotated
-
 local tetris_lib = require("tetris")
 
 function love.load()

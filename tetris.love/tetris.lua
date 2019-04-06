@@ -155,7 +155,7 @@ function M.Tetris:moveTetrominoDown()
         for _, coord in pairs(self:getTetrominoCoordinates()) do
             local i = coord.i
             local j = coord.j
-            if self.grid[i+1][j] ~= 0 then  -- this works even when i+1 goes out of bounds
+            if self.grid[i+1] == nil or self.grid[i+1][j] ~= 0 then
                 return false
             end
         end
@@ -174,7 +174,7 @@ function M.Tetris:moveTetrominoLeft()
         for _, coord in pairs(self:getTetrominoCoordinates()) do
             local i = coord.i
             local j = coord.j
-            if self.grid[i][j-1] ~= 0 then
+            if self.grid[i][j-1] ~= 0 then  -- this works even when j-1 or j+1 goes out of bounds
                 return false
             end
         end
@@ -234,8 +234,8 @@ function M.Tetris:draw()
     -- draw tetromino
     love.graphics.setColor(1,1,1)
     for _, coord in pairs(self:getTetrominoCoordinates()) do
-        local x = (coord.i - 1) * square_size
-        local y = (coord.j - 1) * square_size
+        local y = (coord.i - 1) * square_size
+        local x = (coord.j - 1) * square_size
         love.graphics.rectangle("fill", x, y, square_size, square_size)
     end
 end
