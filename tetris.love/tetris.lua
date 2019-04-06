@@ -150,19 +150,19 @@ function M.Tetris:new(width, height)
     return setmetatable(tetris, self)
 end
 
-function M.Tetris:moveTetrominoDown()
-    local function canMoveDown()
-        for _, coord in pairs(self:getTetrominoCoordinates()) do
-            local i = coord.i
-            local j = coord.j
-            if self.grid[i+1] == nil or self.grid[i+1][j] ~= 0 then
-                return false
-            end
+function M.Tetris:canTetrominoMove(di, dj)
+    for _, coord in pairs(self:getTetrominoCoordinates()) do
+        local i = coord.i
+        local j = coord.j
+        if self.grid[i+di] == nil or self.grid[i+di][j+dj] ~= 0 then
+            return false
         end
-        return true
     end
+    return true
+end
 
-    if canMoveDown() then
+function M.Tetris:moveTetrominoDown()
+    if self:canTetrominoMove(1, 0) then
         for _, coord in pairs(self:getTetrominoCoordinates()) do
             coord.i = coord.i + 1
         end
@@ -170,18 +170,7 @@ function M.Tetris:moveTetrominoDown()
 end
 
 function M.Tetris:moveTetrominoLeft()
-    local function canMoveLeft()
-        for _, coord in pairs(self:getTetrominoCoordinates()) do
-            local i = coord.i
-            local j = coord.j
-            if self.grid[i][j-1] ~= 0 then  -- this works even when j-1 or j+1 goes out of bounds
-                return false
-            end
-        end
-        return true
-    end
-
-    if canMoveLeft() then
+    if self:canTetrominoMove(0, -1) then
         for _, coord in pairs(self:getTetrominoCoordinates()) do
             coord.j = coord.j - 1
         end
@@ -189,18 +178,7 @@ function M.Tetris:moveTetrominoLeft()
 end
 
 function M.Tetris:moveTetrominoRight()
-    local function canMoveRight()
-        for _, coord in pairs(self:getTetrominoCoordinates()) do
-            local i = coord.i
-            local j = coord.j
-            if self.grid[i][j+1] ~= 0 then
-                return false
-            end
-        end
-        return true
-    end
-
-    if canMoveRight() then
+    if self:canTetrominoMove(0, 1) then
         for _, coord in pairs(self:getTetrominoCoordinates()) do
             coord.j = coord.j + 1
         end

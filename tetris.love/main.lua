@@ -5,11 +5,23 @@ function love.load()
     local height = 10
     tetris = tetris_lib.Tetris:new(width, height)
     tetris:resetTetromino()
+
+    time = 0
 end
 
 function love.update(dt)
-    -- TODO update every second
-    --tetris:moveTetrominoDown()
+
+    -- TODO clear complete rows
+
+    time = time + dt
+    if time > 1.0 then
+        if not tetris:canTetrominoMove(1, 0) then
+            -- resetTetromino if it can't move down
+            tetris:resetTetromino()
+        end
+        tetris:moveTetrominoDown()
+        time = 0
+    end
 end
 
 function love.keypressed(key)
