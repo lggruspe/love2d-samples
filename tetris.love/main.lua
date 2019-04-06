@@ -1,6 +1,8 @@
 local tetris_lib = require("tetris")
 
 function love.load()
+    math.randomseed(os.time())
+
     local width = 10
     local height = 10
     tetris = tetris_lib.Tetris:new(width, height)
@@ -13,7 +15,7 @@ function love.update(dt)
     -- TODO clear complete rows
 
     time = time + dt
-    if time > 1.0 then
+    if time > 0.5 then
         if not tetris:canTetrominoMove(1, 0) then
             -- resetTetromino if it can't move down
             tetris:resetTetromino()
