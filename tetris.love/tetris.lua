@@ -3,26 +3,88 @@ local M = {}
 
 M.Tetromino = {}
 
-function M.Tetromino:new(shape)
+function M.Tetromino:new(shape, width, height)
+    -- width and height refer to the size of the tetris grid
     local tetromino = {
+        shape = shape,
         coordinates = {},
-        shape = utils.getRandomShape()
+        pivot = {
+            i = 1,
+            j = math.floor(width/2),
+        }
     }
 
-    -- TODO update coordinates
+    if shape == "I" then
+        tetromino.coordinates = {
+            {i = 0, j = -1},
+            {i = 0, j = 0},
+            {i = 0, j = 1},
+            {i = 0, j = 2}
+        }
+    elseif shape == "J" then
+        tetromino.coordinates = {
+            {i = 0, j = -1},
+            {i = 0, j = 0},
+            {i = 0, j = 1},
+            {i = 1, j = 1}
+        }
+    elseif shape == "L" then
+        tetromino.coordinates = {
+            {i = 1, j = -1},
+            {i = 1, j = 0},
+            {i = 1, j = 1},
+            {i = 0, j = 1}
+        }
+    elseif shape == "O" then
+        tetromino.coordinates = {
+            {i = 0, j = 0},
+            {i = 0, j = 1},
+            {i = 1, j = 0},
+            {i = 1, j = 1}
+        }
+    elseif shape == "T" then
+        tetromino.coordinates = {
+            {i = 0, j = -1},
+            {i = 0, j = 0},
+            {i = 0, j = 1},
+            {i = 1, j = 0}
+        }
+    elseif shape == "S" then
+        tetromino.coordinates = {
+            {i = 0, j = 0},
+            {i = 0, j = 1},
+            {i = 1, j = 0},
+            {i = 1, j = -1}
+        }
+    elseif shape == "Z" then
+        tetromino.coordinates = {
+            {i = 0, j = -1},
+            {i = 0, j = 0},
+            {i = 1, j = 0},
+            {i = 1, j = 1}
+        }
+    end
+
+    self.__index = self
+    return setmetatable(tetromino, self)
 end
 
 M.Tetris = {}
 
 function M.Tetris:getTetrominoCoordinates()
     -- defaults to {} instead of nil
-    if self.tetromino == nil then
+    if self.tetromino == nil or self.tetromino == {} then
         return {}
     end
 
+    local p = self.tetromino.pivot.i
+    local q = self.tetromino.pivot.j
     local coords = {}
-    for _, coord in pairs(self.tetromino) do
-        table.insert(coords, coord)
+    for _, coord in pairs(self.tetromino.coordinates) do
+        table.insert(coords, {
+            i = coord.i + p,
+            j = coord.j + q
+        })
     end
     return coords
 end
@@ -40,83 +102,6 @@ function M.Tetris:flipTetrominoBits()
     end
 end
 
-local function createITetromino(width, height)
-    -- width and height refer to the size of the tetris grid
-    local j0 = math.floor(width/2) - 1
-    return {
-        {i = 1, j = j0},
-        {i = 1, j = j0 + 1},
-        {i = 1, j = j0 + 2},
-        {i = 1, j = j0 + 3}
-    }
-end
-
-local function createJTetromino(width, height)
-    -- width and height refer to the size of the tetris grid
-    local j0 = math.floor(width/2)
-    return {
-        {i = 1, j = j0},  
-        {i = 1, j = j0 + 1}, 
-        {i = 1, j = j0 + 2}, 
-        {i = 2, j = j0 + 2}
-    }
-end
-
-local function createLTetromino(width, height)
-    -- width and height refer to the size of the tetris grid
-    local j0 = math.floor(width/2)
-    return {
-        {i = 1, j = j0},  
-        {i = 1, j = j0 + 1}, 
-        {i = 1, j = j0 + 2}, 
-        {i = 2, j = j0}
-    }
-end
-
-local function createOTetromino(width, height)
-    -- width and height refer to the size of the tetris grid
-    local j0 = math.floor(width/2)
-    return {
-        {i = 1, j = 1},
-        {i = 1, j = 2},
-        {i = 2, j = 1},
-        {i = 2, j = 2}
-    }
-end
-
-local function createTTetromino(width, height)
-    -- width and height refer to the size of the tetris grid
-    local j0 = math.floor(width/2)
-    return {
-        {i = 1, j = j0},  
-        {i = 1, j = j0 + 1}, 
-        {i = 1, j = j0 + 2}, 
-        {i = 2, j = j0 + 1}
-    }
-end
-
-local function createSTetromino(width, height)
-    -- width and height refer to the size of the tetris grid
-    local j0 = math.floor(width/2)
-    return {
-        {i = 1, j = j0 + 2},
-        {i = 1, j = j0 + 1}, 
-        {i = 2, j = j0 + 1}, 
-        {i = 2, j = j0}
-    }
-end
-
-local function createZTetromino(width, height)
-    -- width and height refer to the size of the tetris grid
-    local j0 = math.floor(width/2)
-    return {
-        {i = 1, j = j0},  
-        {i = 1, j = j0 + 1}, 
-        {i = 2, j = j0 + 1}, 
-        {i = 2, j = j0 + 2}
-    }
-end
-
 function M.Tetris:resetTetromino()
     -- flip the coordinates in the grid specified by tetromino,
     -- create a new one, and update nextShape
@@ -132,22 +117,7 @@ function M.Tetris:resetTetromino()
         shape = utils.getRandomShape()
     end
 
-    if shape == "I" then
-        self.tetromino = createITetromino(width, height)
-    elseif shape == "J" then
-        self.tetromino = createJTetromino(width, height)
-    elseif shape == "L" then
-        self.tetromino = createLTetromino(width, height)
-    elseif shape == "O" then
-        self.tetromino = createOTetromino(width, height)
-    elseif shape == "T" then
-        self.tetromino = createTTetromino(width, height)
-    elseif shape == "S" then
-        self.tetromino = createSTetromino(width, height)
-    elseif shape == "Z" then
-        self.tetromino = createZTetromino(width, height)
-    end
-
+    self.tetromino = M.Tetromino:new(shape, width, height)
     self.nextShape = utils.getRandomShape()
 end
 
@@ -187,25 +157,19 @@ end
 
 function M.Tetris:moveTetrominoDown()
     if self:canTetrominoMove(1, 0) then
-        for _, coord in pairs(self:getTetrominoCoordinates()) do
-            coord.i = coord.i + 1
-        end
+        self.tetromino.pivot.i = self.tetromino.pivot.i + 1
     end
 end
 
 function M.Tetris:moveTetrominoLeft()
     if self:canTetrominoMove(0, -1) then
-        for _, coord in pairs(self:getTetrominoCoordinates()) do
-            coord.j = coord.j - 1
-        end
+        self.tetromino.pivot.j = self.tetromino.pivot.j - 1
     end
 end
 
 function M.Tetris:moveTetrominoRight()
     if self:canTetrominoMove(0, 1) then
-        for _, coord in pairs(self:getTetrominoCoordinates()) do
-            coord.j = coord.j + 1
-        end
+        self.tetromino.pivot.j = self.tetromino.pivot.j + 1
     end
 end
 

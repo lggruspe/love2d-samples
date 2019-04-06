@@ -10,7 +10,6 @@ function love.load()
 end
 
 function love.update(dt)
-
     -- TODO clear complete rows
 
     time = time + dt
