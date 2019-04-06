@@ -1,6 +1,17 @@
 local utils = require("utils")
 local M = {}
 
+M.Tetromino = {}
+
+function M.Tetromino:new(shape)
+    local tetromino = {
+        coordinates = {},
+        shape = utils.getRandomShape()
+    }
+
+    -- TODO update coordinates
+end
+
 M.Tetris = {}
 
 function M.Tetris:getTetrominoCoordinates()
@@ -62,6 +73,17 @@ local function createLTetromino(width, height)
     }
 end
 
+local function createOTetromino(width, height)
+    -- width and height refer to the size of the tetris grid
+    local j0 = math.floor(width/2)
+    return {
+        {i = 1, j = 1},
+        {i = 1, j = 2},
+        {i = 2, j = 1},
+        {i = 2, j = 2}
+    }
+end
+
 local function createTTetromino(width, height)
     -- width and height refer to the size of the tetris grid
     local j0 = math.floor(width/2)
@@ -116,6 +138,8 @@ function M.Tetris:resetTetromino()
         self.tetromino = createJTetromino(width, height)
     elseif shape == "L" then
         self.tetromino = createLTetromino(width, height)
+    elseif shape == "O" then
+        self.tetromino = createOTetromino(width, height)
     elseif shape == "T" then
         self.tetromino = createTTetromino(width, height)
     elseif shape == "S" then
