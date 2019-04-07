@@ -176,7 +176,7 @@ function M.Tetris:rotateTetrominoClockwise()
         return
     end
 
-    -- backup self.tetromino.coordinates and rotate
+    -- rotate
     local p = self.tetromino.pivot.i
     local q = self.tetromino.pivot.j
     local coords = self:getTetrominoCoordinates()
