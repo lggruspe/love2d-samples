@@ -164,37 +164,6 @@ function M.Tetris:moveTetromino(di, dj)
     end
 end
 
---[[
-function M.Tetris:canRotateTetrominoClockwise()
-    if self.tetromino.shape == "O" then
-        return true
-    elseif self.tetromino.shape == "I" then
-        -- TODO continue here
-        local coord = utils.findMember(self.tetromino.coordinates, function (a)
-            return a.i == 0 and a.j == -2
-        end)
-        coord.j = 2
-    end
-
-    for _, coord in pairs(self:getTetrominoCoordinates()) do
-        local i = coord.j
-        local j = -coord.i
-        if self.grid[i] == nil or self.grid[i][j] ~= ' ' then
-            return false
-        end
-    end
-    return true
-end
-]]--
-
-function M.Tetris:canRotateTetrominoCounterClockwise()
-    if self.tetromino.shape == "O" then
-        return true
-    end
-    -- TODO continue here
-    return false
-end
-
 function M.Tetris:isTetrominoValid()
     for _, coord in pairs(self:getTetrominoCoordinates()) do
         local i = coord.i
@@ -215,50 +184,24 @@ local function printCoordinates(coords)
 end
 
 function M.Tetris:rotateTetrominoClockwise()
+    -- FIXME some tetrominos stop moving after rotating near right wall
     if self.tetromino.shape == "O" then
         return
     end
 
-    printCoordinates(self.tetromino.coordinates)    -- TODO Temp
-
     -- backup self.tetromino.coordinates and rotate
     local checkpoint = {}
-
-    --[[
-    for _, coord in pairs(self:getTetrominoCoordinates()) do
-        table.insert(checkpoint, coord)             -- TODO should coord be {i=coord.i,j=coord.j}?
-        coord.i, coord.j = coord.j, -coord.i        -- 90 degree clockwise rotation
-    end
-    ]]--
-
-    --[[
-    for idx, coord in pairs(self:getTetrominoCoordinates()) do 
+    local p = self.tetromino.pivot.i
+    local q = self.tetromino.pivot.j
+    local coords = self:getTetrominoCoordinates()
+    for idx, coord in pairs(coords) do
         table.insert(checkpoint, coord)
-        local coords = self.tetromino.coordinates
-        coords[idx].i, coords[idx].j = coords[idx].j, -coords[idx].i
-    end
-    ]]--
-
-
-    for idx, coord in pairs(self.tetromino.coordinates) do
-        table.insert(checkpoint, coord)
-        local coords = self.tetromino.coordinates
-        coords[idx].i, coords[idx].j = coords[idx].j, -coords[idx].i
-    end
-
-    printCoordinates(self.tetromino.coordinates)    -- TODO temp
-
-    -- special case: I tetrominoes
-    if self.tetromino.shape == "I" then
-        print("SpeciaL: I")
-        -- move one step to hte right if horizontal
-        -- i.e. tetromino.coordinates contains (0,-2)
-        local coord = utils.findMember(self.tetromino.coordinates, function (a)
-            return a.i == 0 and a.j == -2
-        end)
-        if coord ~= nil then
-            coord.j = 2
-        end
+        local i = coord.i
+        local j = coord.j
+        local di = i - p
+        local dj = j - q
+        coords[idx].i = p + dj
+        coords[idx].j = q - di
     end
 
     -- return to checkpoint if new position is invalid
@@ -269,11 +212,11 @@ function M.Tetris:rotateTetrominoClockwise()
 end
 
 function M.Tetris:rotateTetrominoCounterClockwise()
-    if self:canRotateTetrominoCounterClockwise() then
-        for i = 1, 3 do
-            self:rotateTetrominoClockwise()
-        end
+    for i = 1, 3 do
+        self:rotateTetrominoClockwise()
     end
+
+    -- TODO undo if rotation is invalid
 end
 
 function M.Tetris:draw()
