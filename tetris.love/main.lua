@@ -20,18 +20,18 @@ function love.update(dt)
             -- resetTetromino if it can't move down
             tetris:resetTetromino()
         end
-        tetris:moveTetrominoDown()
+        tetris:moveTetromino(1,0)
         time = 0
     end
 end
 
 function love.keypressed(key)
     if key == "down" then
-        tetris:moveTetrominoDown()
+        tetris:moveTetromino(1,0)
     elseif key == "left" then
-        tetris:moveTetrominoLeft()
+        tetris:moveTetromino(0,-1)
     elseif key == "right" then
-        tetris:moveTetrominoRight()
+        tetris:moveTetromino(0,1)
     elseif key == "rshift" then
         tetris:rotateTetrominoClockwise()
     elseif key == "lshift" then

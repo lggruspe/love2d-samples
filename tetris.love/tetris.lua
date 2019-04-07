@@ -65,6 +65,12 @@ function M.Tetromino:new(shape, width, height)
         }
     end
 
+    local coords = tetromino.coordinates
+    for idx, coord in pairs(coords) do
+        coords[idx].i = coords[idx].i + tetromino.pivot.i
+        coords[idx].j = coords[idx].j + tetromino.pivot.j
+    end
+
     self.__index = self
     return setmetatable(tetromino, self)
 end
@@ -76,17 +82,7 @@ function M.Tetris:getTetrominoCoordinates()
     if self.tetromino == nil or self.tetromino == {} then
         return {}
     end
-
-    local p = self.tetromino.pivot.i
-    local q = self.tetromino.pivot.j
-    local coords = {}
-    for _, coord in pairs(self.tetromino.coordinates) do
-        table.insert(coords, {
-            i = coord.i + p,
-            j = coord.j + q
-        })
-    end
-    return coords
+    return self.tetromino.coordinates
 end
 
 function M.Tetris:flipTetrominoBits()
@@ -155,21 +151,16 @@ function M.Tetris:canTetrominoMove(di, dj)
     return true
 end
 
-function M.Tetris:moveTetrominoDown()
-    if self:canTetrominoMove(1, 0) then
-        self.tetromino.pivot.i = self.tetromino.pivot.i + 1
-    end
-end
+function M.Tetris:moveTetromino(di, dj)
+    if self:canTetrominoMove(di, dj) then
+        local coords = self.tetromino.coordinates
+        for idx, coord in pairs(coords) do
+            coords[idx].i = coords[idx].i + di
+            coords[idx].j = coords[idx].j + dj
+        end
 
-function M.Tetris:moveTetrominoLeft()
-    if self:canTetrominoMove(0, -1) then
-        self.tetromino.pivot.j = self.tetromino.pivot.j - 1
-    end
-end
-
-function M.Tetris:moveTetrominoRight()
-    if self:canTetrominoMove(0, 1) then
-        self.tetromino.pivot.j = self.tetromino.pivot.j + 1
+        self.tetromino.pivot.i = self.tetromino.pivot.i + di
+        self.tetromino.pivot.j = self.tetromino.pivot.j + dj
     end
 end
 
@@ -232,6 +223,7 @@ function M.Tetris:rotateTetrominoClockwise()
 
     -- backup self.tetromino.coordinates and rotate
     local checkpoint = {}
+
     --[[
     for _, coord in pairs(self:getTetrominoCoordinates()) do
         table.insert(checkpoint, coord)             -- TODO should coord be {i=coord.i,j=coord.j}?
@@ -246,6 +238,7 @@ function M.Tetris:rotateTetrominoClockwise()
         coords[idx].i, coords[idx].j = coords[idx].j, -coords[idx].i
     end
     ]]--
+
 
     for idx, coord in pairs(self.tetromino.coordinates) do
         table.insert(checkpoint, coord)
