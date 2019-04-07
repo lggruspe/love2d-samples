@@ -140,28 +140,15 @@ function M.Tetris:new(width, height)
     return setmetatable(tetris, self)
 end
 
-function M.Tetris:canTetrominoMove(di, dj)
-    for _, coord in pairs(self:getTetrominoCoordinates()) do
-        local i = coord.i
-        local j = coord.j
-        if self.grid[i+di] == nil or self.grid[i+di][j+dj] ~= ' ' then
-            return false
-        end
-    end
-    return true
-end
-
 function M.Tetris:moveTetromino(di, dj)
-    if self:canTetrominoMove(di, dj) then
-        local coords = self.tetromino.coordinates
-        for idx, coord in pairs(coords) do
-            coords[idx].i = coords[idx].i + di
-            coords[idx].j = coords[idx].j + dj
-        end
-
-        self.tetromino.pivot.i = self.tetromino.pivot.i + di
-        self.tetromino.pivot.j = self.tetromino.pivot.j + dj
+    local coords = self.tetromino.coordinates
+    for idx, coord in pairs(coords) do
+        coords[idx].i = coords[idx].i + di
+        coords[idx].j = coords[idx].j + dj
     end
+
+    self.tetromino.pivot.i = self.tetromino.pivot.i + di
+    self.tetromino.pivot.j = self.tetromino.pivot.j + dj
 end
 
 function M.Tetris:isTetrominoValid()
@@ -184,18 +171,16 @@ local function printCoordinates(coords)
 end
 
 function M.Tetris:rotateTetrominoClockwise()
-    -- FIXME some tetrominos stop moving after rotating near right wall
+    -- FIXME some tetrominos have weird rotations, especially near the right wall
     if self.tetromino.shape == "O" then
         return
     end
 
     -- backup self.tetromino.coordinates and rotate
-    local checkpoint = {}
     local p = self.tetromino.pivot.i
     local q = self.tetromino.pivot.j
     local coords = self:getTetrominoCoordinates()
     for idx, coord in pairs(coords) do
-        table.insert(checkpoint, coord)
         local i = coord.i
         local j = coord.j
         local di = i - p
@@ -203,20 +188,12 @@ function M.Tetris:rotateTetrominoClockwise()
         coords[idx].i = p + dj
         coords[idx].j = q - di
     end
-
-    -- return to checkpoint if new position is invalid
-    if not self:isTetrominoValid() then
-        print("Restore checkpoint")
-        self.tetromino.coordinates = checkpoint
-    end
 end
 
 function M.Tetris:rotateTetrominoCounterClockwise()
     for i = 1, 3 do
         self:rotateTetrominoClockwise()
     end
-
-    -- TODO undo if rotation is invalid
 end
 
 function M.Tetris:draw()
@@ -242,6 +219,87 @@ function M.Tetris:draw()
         local y = (coord.i - 1) * square_size
         local x = (coord.j - 1) * square_size
         love.graphics.rectangle("fill", x, y, square_size, square_size)
+    end
+end
+
+function M.Tetris:moveTetrominoDown()
+    tetris:moveTetromino(1,0)
+end
+
+function M.Tetris:moveTetrominoLeft()
+    tetris:moveTetromino(0,-1)
+end
+
+function M.Tetris:moveTetrominoRight()
+    tetris:moveTetromino(0,1)
+end
+
+function M.Tetris:moveWithCheckpoint(moveMethod)
+    -- returns true if checkpoint used
+    local checkpoint = {
+        shape = self.tetromino.shape,
+        coordinates = {},
+        pivot = self.tetromino.pivot
+    }
+    for _, coord in pairs(self.tetromino.coordinates) do
+        table.insert(checkpoint.coordinates, {i=coord.i, j=coord.j})
+    end
+
+    moveMethod(self)
+    if not self:isTetrominoValid() then
+        self.tetromino = checkpoint
+        return true
+    end
+
+    return false
+end
+
+function M.Tetris:clearCompleteRows()
+    local function getRowState(i)
+        local empty = true
+        local complete = true
+        for j, a in pairs(self.grid[i]) do
+            if a ~= ' ' then
+                empty = false
+            elseif a == ' ' then
+                complete = false
+            end
+        end
+        if empty then
+            return "empty"
+        elseif complete then
+            return "complete"
+        else
+            return "nonempty"
+        end
+    end
+
+    local function moveRowsDown(i)
+        -- (row i will be removed)
+        local width = #(self.grid[i])
+
+        local j = i - 1
+        while j >= 1 do
+            if getRowState(j) == "empty" then
+                break
+            end
+            self.grid[j+1] = self.grid[j]
+            j = j - 1
+        end
+        self.grid[j+1] = {}
+        for k = 1, width do
+            self.grid[j+1][k] = ' '
+        end
+    end
+
+    for i = #self.grid, 1, -1 do
+        -- stop when row is empty
+        local state = getRowState(i)
+        if state == "empty" then
+            return
+        elseif state == "complete" then
+            moveRowsDown(i)
+        end
     end
 end
 

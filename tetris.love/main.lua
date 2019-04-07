@@ -2,6 +2,7 @@ local tetris_lib = require("tetris")
 
 function love.load()
     math.randomseed(os.time())
+    love.keyboard.setKeyRepeat(true)
 
     local width = 10
     local height = 20
@@ -12,30 +13,30 @@ function love.load()
 end
 
 function love.update(dt)
-    -- TODO clear complete rows
-
     time = time + dt
-    if time > 0.5 then
-        if not tetris:canTetrominoMove(1, 0) then
+    if time > 0.25 then
+        local checkpointUsed = tetris:moveWithCheckpoint(tetris.moveTetrominoDown)
+        if checkpointUsed then
             -- resetTetromino if it can't move down
             tetris:resetTetromino()
         end
-        tetris:moveTetromino(1,0)
+
+        tetris:clearCompleteRows()
         time = 0
     end
 end
 
 function love.keypressed(key)
     if key == "down" then
-        tetris:moveTetromino(1,0)
+        tetris:moveWithCheckpoint(tetris.moveTetrominoDown)
     elseif key == "left" then
-        tetris:moveTetromino(0,-1)
+        tetris:moveWithCheckpoint(tetris.moveTetrominoLeft)
     elseif key == "right" then
-        tetris:moveTetromino(0,1)
-    elseif key == "rshift" then
-        tetris:rotateTetrominoClockwise()
+        tetris:moveWithCheckpoint(tetris.moveTetrominoRight)
+    elseif key == "rshift" or key == "space" then
+        tetris:moveWithCheckpoint(tetris.rotateTetrominoClockwise)
     elseif key == "lshift" then
-        tetris:rotateTetrominoCounterClockwise()
+        tetris:moveWithCheckpoint(tetris.rotateTetrominoCounterClockwise)
     end
 end
 
