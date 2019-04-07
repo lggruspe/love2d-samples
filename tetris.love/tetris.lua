@@ -98,7 +98,7 @@ function M.Tetris:flipTetrominoBits()
     for _, coord in pairs(self:getTetrominoCoordinates()) do
         local i = coord.i
         local j = coord.j
-        self.grid[i][j] = 1
+        self.grid[i][j] = self.tetromino.shape
     end
 end
 
@@ -136,7 +136,7 @@ function M.Tetris:new(width, height)
     for i = 1, height do
         tetris.grid[i] = {}
         for j = 1, width do
-            tetris.grid[i][j] = 0
+            tetris.grid[i][j] = ' '
         end
     end
 
@@ -148,7 +148,7 @@ function M.Tetris:canTetrominoMove(di, dj)
     for _, coord in pairs(self:getTetrominoCoordinates()) do
         local i = coord.i
         local j = coord.j
-        if self.grid[i+di] == nil or self.grid[i+di][j+dj] ~= 0 then
+        if self.grid[i+di] == nil or self.grid[i+di][j+dj] ~= ' ' then
             return false
         end
     end
@@ -188,7 +188,7 @@ function M.Tetris:canRotateTetrominoClockwise()
     for _, coord in pairs(self:getTetrominoCoordinates()) do
         local i = coord.j
         local j = -coord.i
-        if self.grid[i] == nil or self.grid[i][j] ~= 0 then
+        if self.grid[i] == nil or self.grid[i][j] ~= ' ' then
             return false
         end
     end
@@ -208,7 +208,7 @@ function M.Tetris:isTetrominoValid()
     for _, coord in pairs(self:getTetrominoCoordinates()) do
         local i = coord.i
         local j = coord.j
-        if self.grid[i] == nil or self.grid[i][j] ~= 0 then
+        if self.grid[i] == nil or self.grid[i][j] ~= ' ' then
             return false
         end
     end
@@ -291,8 +291,8 @@ function M.Tetris:draw()
     for i, row in pairs(self.grid) do
         local x = 0
         for j, square in pairs(row) do
-            -- 1: white, 0: black
-            love.graphics.setColor(square, square, square)
+            local r, g, b = utils.getShapeColor(square)
+            love.graphics.setColor(r, g, b)
             love.graphics.rectangle("fill", x, y, square_size, square_size)
             x = x + square_size
         end
@@ -300,7 +300,8 @@ function M.Tetris:draw()
     end
 
     -- draw tetromino
-    love.graphics.setColor(1,1,1)
+    local r, g, b = utils.getShapeColor(self.tetromino.shape)
+    love.graphics.setColor(r, g, b)
     for _, coord in pairs(self:getTetrominoCoordinates()) do
         local y = (coord.i - 1) * square_size
         local x = (coord.j - 1) * square_size

@@ -15,4 +15,24 @@ function M.findMember(set, ind)
     return nil
 end
 
+function M.getShapeColor(shape)
+    if shape == "I" then
+        return 0, 1, 1
+    elseif shape == "O" then
+        return 1, 1, 0
+    elseif shape == "T" then
+        return 0.5, 0, 0.5
+    elseif shape == "S" then
+        return 0, 0.5, 0
+    elseif shape == "Z" then
+        return 1, 0, 0
+    elseif shape == "J" then
+        return 0, 0, 1
+    elseif shape == "L" then
+        return 1, 0.65, 0
+    elseif shape == " " then
+        return 0, 0, 0
+    end
+end
+
 return M

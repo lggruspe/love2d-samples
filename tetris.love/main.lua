@@ -4,7 +4,7 @@ function love.load()
     math.randomseed(os.time())
 
     local width = 10
-    local height = 10
+    local height = 20
     tetris = tetris_lib.Tetris:new(width, height)
     tetris:resetTetromino()
 
