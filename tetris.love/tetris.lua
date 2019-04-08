@@ -171,7 +171,9 @@ local function printCoordinates(coords)
 end
 
 function M.Tetris:rotateTetrominoClockwise()
-    -- FIXME some tetrominos have weird rotations, especially near the right wall
+    -- FIXME tetromino pivot gets thrown off after bumping into either wall
+    -- TODO also check isTetrominoValid
+    -- or moveWithCheckpoint
     if self.tetromino.shape == "O" then
         return
     end
@@ -196,8 +198,10 @@ function M.Tetris:rotateTetrominoCounterClockwise()
     end
 end
 
-function M.Tetris:draw()
-    local square_size = 30
+function M.Tetris:draw(width, height)
+    local minWindowDim = math.min(love.graphics.getHeight(), love.graphics.getWidth())
+    local maxGridDim = math.max(width, height)
+    local square_size = math.floor(minWindowDim/maxGridDim)
 
     -- draw grid
     local y = 0
@@ -301,6 +305,20 @@ function M.Tetris:clearCompleteRows()
             moveRowsDown(i)
         end
     end
+end
+
+function M.Tetris:isGameOver()
+    local width = #(self.grid[1])
+    for i = 1, 2 do
+        for j = 1, width do
+            if self.grid[i][j] ~= ' ' then
+                print('debug', self.grid[i][j], i, j)
+                return true
+            end
+
+        end
+    end
+    return false
 end
 
 return M

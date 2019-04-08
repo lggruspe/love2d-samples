@@ -4,8 +4,8 @@ function love.load()
     math.randomseed(os.time())
     love.keyboard.setKeyRepeat(true)
 
-    local width = 10
-    local height = 20
+    width = 10
+    height = 22 -- top 2 rows are spwaning points
     tetris = tetris_lib.Tetris:new(width, height)
     tetris:resetTetromino()
 
@@ -14,14 +14,18 @@ end
 
 function love.update(dt)
     time = time + dt
-    if time > 0.25 then
-        local checkpointUsed = tetris:moveWithCheckpoint(tetris.moveTetrominoDown)
-        if checkpointUsed then
-            -- resetTetromino if it can't move down
+    if time > 0.5 then
+        if tetris:isGameOver() then
+            tetris = tetris_lib.Tetris:new(width, height)
             tetris:resetTetromino()
+        else
+            local checkpointUsed = tetris:moveWithCheckpoint(tetris.moveTetrominoDown)
+            if checkpointUsed then
+                -- resetTetromino if it can't move down
+                tetris:resetTetromino()
+            end
+            tetris:clearCompleteRows()
         end
-
-        tetris:clearCompleteRows()
         time = 0
     end
 end
@@ -41,5 +45,5 @@ function love.keypressed(key)
 end
 
 function love.draw()
-    tetris:draw()
+    tetris:draw(width, height)
 end
