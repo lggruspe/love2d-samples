@@ -162,18 +162,17 @@ function M.Tetris:isTetrominoValid()
     return true
 end
 
-local function printCoordinates(coords)
+function M.Tetris:printCoordinates()
+    print("pivot: " .. self.tetromino.pivot.i .. ", " .. self.tetromino.pivot.j)
     print("coordinates: {" )
-    for _, coord in pairs(coords) do
+    for _, coord in pairs(self:getTetrominoCoordinates()) do
         print("\t(" .. coord.i .. ", " .. coord.j .. ")")
     end
     print("}")
+    print()
 end
 
 function M.Tetris:rotateTetrominoClockwise()
-    -- FIXME tetromino pivot gets thrown off after bumping into either wall
-    -- TODO also check isTetrominoValid
-    -- or moveWithCheckpoint
     if self.tetromino.shape == "O" then
         return
     end
@@ -243,7 +242,10 @@ function M.Tetris:moveWithCheckpoint(moveMethod)
     local checkpoint = {
         shape = self.tetromino.shape,
         coordinates = {},
-        pivot = self.tetromino.pivot
+        pivot = {
+            i = self.tetromino.pivot.i,
+            j = self.tetromino.pivot.j
+        }
     }
     for _, coord in pairs(self.tetromino.coordinates) do
         table.insert(checkpoint.coordinates, {i=coord.i, j=coord.j})

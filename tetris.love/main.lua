@@ -14,7 +14,7 @@ end
 
 function love.update(dt)
     time = time + dt
-    if time > 0.5 then
+    if time > 0.25 then
         if tetris:isGameOver() then
             tetris = tetris_lib.Tetris:new(width, height)
             tetris:resetTetromino()
